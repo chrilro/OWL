@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>OWL Suite — Ordinary Working Linguist</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f0e8; --surface:#faf7f2; --surface2:#ede8de;
+  --border:#d4c9b0; --border-strong:#a89878;
+  --text:#2c2416; --text-muted:#7a6d55;
+  --accent:#2d6a4f; --accent-lt:#40916c; --accent-bg:#d8ede3;
+  --danger:#b72b1e; --danger-bg:#fde8e6;
+  --warn:#7d5c00; --warn-bg:#fdf2cc; --warn-border:#e0c458;
+  --mono:'JetBrains Mono', monospace;
+  --serif:'Source Serif 4', Georgia, serif;
+  --display:'Playfair Display', Georgia, serif;
+  --ink:#2c2416;
+}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:var(--serif);background:var(--bg);color:var(--text);line-height:1.7}
+
+/* NOTICE BANNER */
+.notice-banner{background:var(--warn-bg);border-bottom:1px solid var(--warn-border);color:var(--warn);text-align:center;padding:.6rem 1rem;font-size:.85rem;font-family:var(--serif);}
+.notice-banner strong{font-weight:600}
+
+/* HEADER */
+.site-header{background:var(--ink);color:var(--bg);padding:0 2rem}
+.header-inner{max-width:860px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:60px}
+.site-title{font-family:var(--display);font-size:1.1rem;font-weight:700;color:var(--bg);text-decoration:none;letter-spacing:.01em}
+.site-nav a{font-size:.85rem;color:rgba(245,240,232,.65);text-decoration:none;margin-left:1.5rem;transition:color .15s;font-family:var(--serif)}
+.site-nav a:hover{color:var(--accent-lt)}
+
+/* HERO */
+.hero{background:#20190f;color:var(--bg);padding:4.5rem 2rem}
+.hero-inner{max-width:760px;margin:0 auto;text-align:center}
+.hero .kicker{font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-lt);margin-bottom:1rem}
+.hero h1{font-family:var(--display);font-size:2.5rem;font-weight:700;line-height:1.2;margin-bottom:.85rem}
+.hero h1 span{color:var(--accent-lt)}
+.hero p{font-size:1.05rem;color:rgba(245,240,232,.82);max-width:580px;margin:0 auto 2.25rem}
+.hero .testing-flag{display:inline-block;background:rgba(224,196,88,.15);border:1px solid rgba(224,196,88,.4);color:#e0c458;font-family:var(--mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;padding:5px 14px;border-radius:20px;margin-bottom:1.75rem}
+.btn-row{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:8px;font-family:var(--serif);font-size:.95rem;font-weight:600;text-decoration:none;transition:background .15s,transform .1s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-lt)}
+.btn-secondary{background:rgba(255,255,255,.08);color:var(--bg);border:1px solid rgba(255,255,255,.2)}
+.btn-secondary:hover{background:rgba(255,255,255,.16)}
+
+/* MAIN */
+.main{max-width:860px;margin:0 auto;padding:4rem 2rem}
+
+/* FEATURES */
+.features{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.25rem;margin-bottom:4rem}
+.feature-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.25rem}
+.feature-icon{font-size:1.5rem;margin-bottom:.6rem}
+.feature-card h3{font-family:var(--display);font-size:.98rem;font-weight:700;color:var(--text);margin-bottom:.35rem}
+.feature-card p{font-size:.82rem;color:var(--text-muted);line-height:1.6}
+
+/* SECTIONS */
+.section-title{font-family:var(--display);font-size:1.35rem;font-weight:700;color:var(--text);margin-bottom:1rem;padding-bottom:.5rem;border-bottom:2px solid var(--border)}
+.section{margin-bottom:3.5rem}
+.section > p.lead{font-size:.92rem;color:var(--text-muted);margin-bottom:1.25rem}
+
+/* WORKFLOW */
+.steps{display:flex;flex-direction:column;gap:.75rem;counter-reset:step}
+.step{display:flex;gap:1rem;align-items:flex-start;counter-increment:step}
+.step::before{content:counter(step);background:var(--accent);color:#fff;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.78rem;font-weight:600;flex-shrink:0;margin-top:1px}
+.step p{font-size:.9rem;color:var(--text);line-height:1.6;padding-top:3px}
+.step p strong{color:var(--accent)}
+.step p code{background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:1px 5px;font-family:var(--mono);font-size:.82em}
+
+/* BROWSER SUPPORT NOTE */
+.support-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.1rem 1.25rem;margin-top:1.5rem;font-size:.85rem;color:var(--text-muted)}
+.support-box strong{color:var(--text)}
+.support-row{display:flex;gap:1.5rem;margin-top:.6rem;flex-wrap:wrap}
+.support-row span{font-family:var(--mono);font-size:.78rem;padding:3px 10px;border-radius:20px}
+.support-yes{background:var(--accent-bg);color:var(--accent)}
+.support-no{background:var(--danger-bg);color:var(--danger)}
+
+/* CITATION */
+.citation-box{background:var(--accent-bg);border-left:4px solid var(--accent);border-radius:0 8px 8px 0;padding:1rem 1.25rem;font-size:.9rem;color:var(--text);font-style:italic;margin-top:1rem}
+
+/* LICENSE */
+.license-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.5rem}
+.license-box h3{font-family:var(--display);font-size:.92rem;font-weight:700;color:var(--text);margin-bottom:.5rem;margin-top:1rem}
+.license-box h3:first-child{margin-top:0}
+.license-box p,.license-box li{font-size:.85rem;color:var(--text-muted);line-height:1.7}
+.license-box ul{margin-left:1.25rem}
+.license-box a{color:var(--accent);text-decoration:none}
+.license-box a:hover{text-decoration:underline}
+.license-badge{display:inline-block;background:var(--ink);color:var(--bg);font-family:var(--mono);font-size:.72rem;font-weight:600;padding:3px 12px;border-radius:20px;margin-bottom:1rem;letter-spacing:.04em}
+
+/* FILES */
+.files-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem}
+.file-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.25rem;text-align:center}
+.file-card h3{font-family:var(--mono);font-size:.92rem;font-weight:600;color:var(--text);margin-bottom:.35rem;word-break:break-all}
+.file-card p{font-size:.8rem;color:var(--text-muted);margin-bottom:1rem}
+.btn-download{display:inline-flex;align-items:center;gap:6px;background:var(--ink);color:var(--bg);padding:9px 20px;border-radius:7px;font-family:var(--serif);font-size:.85rem;font-weight:600;text-decoration:none;transition:background .15s}
+.btn-download:hover{background:#3a2f1c}
+
+/* FOOTER */
+.site-footer{background:var(--ink);color:rgba(245,240,232,.5);text-align:center;padding:2rem;font-size:.8rem}
+.site-footer a{color:rgba(245,240,232,.7);text-decoration:none}
+.site-footer a:hover{color:var(--accent-lt)}
+
+@media(max-width:600px){
+  .hero h1{font-size:1.8rem}
+  .files-grid{grid-template-columns:1fr}
+  .header-inner{flex-direction:column;height:auto;padding:1rem 0;gap:.5rem}
+  .site-nav a:first-child{margin-left:0}
+}
+</style>
+</head>
+<body>
+
+<div class="notice-banner">⚠ <strong>Preliminary / testing version</strong> — OWL Suite is under active development. Back up your project folder regularly and send feedback to <a href="mailto:chris.linguist@gmail.com" style="color:var(--warn)">chris.linguist@gmail.com</a>.</div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="site-title">OWL Suite</a>
+    <nav class="site-nav">
+      <a href="#features">Features</a>
+      <a href="#how-to-use">How to use</a>
+      <a href="#citation">Citation</a>
+      <a href="#license">License</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="kicker">Ordinary Working Linguist</div>
+    <div class="testing-flag">Preliminary · Testing Version</div>
+    <h1>Five tools for language documentation, <span>one shared file</span></h1>
+    <p>A free, offline-capable toolkit for writing texts, interlinear glossing, building a lexicon, corpus analysis, and vocabulary/sentence elicitation — all in one HTML file, sharing one project folder.</p>
+    <div class="btn-row">
+      <a href="owl_suite.html" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+        Open OWL Suite
+      </a>
+      <a href="#how-to-use" class="btn btn-secondary">How it works</a>
+    </div>
+  </div>
+</section>
+
+<main class="main">
+
+  <section class="section" id="features">
+    <div class="section-title">Features</div>
+    <div class="features">
+      <div class="feature-card">
+        <div class="feature-icon">✍️</div>
+        <h3>Writer</h3>
+        <p>Write or import texts, add per-sentence and whole-text translations in any number of languages, and find &amp; replace across the corpus.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔤</div>
+        <h3>Glosser</h3>
+        <p>Interlinear morpheme glossing with a suggester that learns from your own confirmed glosses — allomorphs, reduplication, and infixes included.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📚</div>
+        <h3>Lexicon</h3>
+        <p>The project dictionary: morphemes, glosses, allomorphs, part of speech, semantic domains, and one-click promotion from the corpus.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Analyze</h3>
+        <p>Frequency lists, KWIC concordance, multi-domain sentence search, collocation stats, and a phonology tab with segment inventory and IPA chart.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎙</div>
+        <h3>Elicit</h3>
+        <p>Vocabulary elicitation from prompt-list domains, plus questionnaire-driven sentence elicitation for TAM and narrative sequences.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔗</div>
+        <h3>One shared format</h3>
+        <p>Every tool reads and writes the same plain-text files and JSON sidecars. No import, no export — an edit in one tool is simply there in another.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✈️</div>
+        <h3>Works offline</h3>
+        <p>A single HTML file plus one shared JS file. No installation, no server, no account, no internet required once downloaded.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📁</div>
+        <h3>Your data stays yours</h3>
+        <p>Everything is saved as plain text and JSON directly to a folder you choose on your own computer — nothing is uploaded anywhere.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="how-to-use">
+    <div class="section-title">How to use</div>
+    <div class="steps">
+      <div class="step"><p><strong>Download</strong> both <code>owl_suite.html</code> and <code>suite-core.js</code> into the same folder — OWL Suite needs both files together to run.</p></div>
+      <div class="step"><p><strong>Open</strong> <code>owl_suite.html</code> in Chrome or Edge (see browser support below).</p></div>
+      <div class="step"><p><strong>Choose a folder</strong> for your project. Everything you save lives there as plain text and JSON.</p></div>
+      <div class="step"><p><strong>Switch tools</strong> using the tabs across the top — Writer, Glosser, Lexicon, Analyze, and Elicit all share the one folder you picked.</p></div>
+      <div class="step"><p>Start in <strong>Writer</strong>, gloss it in <strong>Glosser</strong>, curate morphemes in <strong>Lexicon</strong>, and search or check phonology in <strong>Analyze</strong> — or collect new vocabulary and sentences in <strong>Elicit</strong>.</p></div>
+      <div class="step"><p><strong>Your folder is portable</strong> — copy it, back it up, or move it to another computer. OWL Suite reconnects automatically the next time you open the same folder.</p></div>
+    </div>
+
+    <div class="support-box">
+      <strong>Browser support:</strong> OWL Suite runs entirely in your browser with no server, but it depends on the File System Access API to read and write your project folder directly.
+      <div class="support-row">
+        <span class="support-yes">✓ Chrome (desktop)</span>
+        <span class="support-yes">✓ Edge (desktop)</span>
+        <span class="support-no">✗ Safari</span>
+        <span class="support-no">✗ Firefox</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="citation">
+    <div class="section-title">Citation</div>
+    <p class="lead">If you use OWL Suite in your research or language documentation work, please cite it as:</p>
+    <div class="citation-box">
+      Rogers, Chris. 2026. <em>OWL Suite (Ordinary Working Linguist)</em>. Software.
+    </div>
+  </section>
+
+  <section class="section" id="license">
+    <div class="section-title">License</div>
+    <div class="license-box">
+      <div class="license-badge">© 2026 Chris Rogers</div>
+      <p>This software is a <strong>preliminary, testing version</strong> made available for <strong>individual, non-commercial use only</strong>, provided as-is with no warranty.</p>
+
+      <h3>Permitted use</h3>
+      <ul>
+        <li>A student, researcher, or community member using the tool for personal or academic language documentation</li>
+      </ul>
+
+      <h3>Not permitted without a license</h3>
+      <ul>
+        <li>Commercial use of any kind</li>
+        <li>Deployment or distribution for use by a group, organization, institution, or classroom</li>
+      </ul>
+
+      <h3>Licensing inquiries</h3>
+      <p>For institutional, classroom, or commercial licensing contact: <a href="mailto:chris.linguist@gmail.com">chris.linguist@gmail.com</a></p>
+
+      <h3>All rights reserved</h3>
+      <p>Unauthorized commercial use or group deployment of this software is prohibited.</p>
+    </div>
+  </section>
+
+  <section class="section" id="files">
+    <div class="section-title">Files you need</div>
+    <div class="files-grid">
+      <div class="file-card">
+        <h3>owl_suite.html</h3>
+        <p>The whole suite — all five tools in one file.</p>
+        <a href="owl_suite.html" class="btn-download">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
+          Open
+        </a>
+      </div>
+      <div class="file-card">
+        <h3>suite-core.js</h3>
+        <p>Shared rules every tool depends on. Must sit next to <code>owl_suite.html</code>.</p>
+        <a href="suite-core.js" class="btn-download" download>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M6 11l6 6 6-6"/><path d="M5 21h14"/></svg>
+          Download
+        </a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <p>OWL Suite · Ordinary Working Linguist · <a href="mailto:chris.linguist@gmail.com">chris.linguist@gmail.com</a></p>
+  <p style="margin-top:.5rem">© 2026 Chris Rogers · Preliminary testing version · Individual non-commercial use only</p>
+</footer>
+
+</body>
+</html>
