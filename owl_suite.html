@@ -1327,6 +1327,7 @@
 
     <div id="tool_lexicon_dictionarySidebar" style="display:none;">
       <div class="search-wrap">
+        <span style="display:block;font-family:var(--serif);font-size:.68rem;font-style:italic;color:rgba(245,240,232,.4);margin-bottom:12px;">Showing/exporting whatever search + domain + type filter is currently set on the Entries tab — switch there to narrow or clear it.</span>
         <label style="display:block;font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(245,240,232,.4);margin-bottom:6px;">Sort by</label>
         <select id="tool_lexicon_dictSortSelect" onchange="onDictSortChange_lexicon()">
           <option value="alpha">Alphabetical (headword)</option>
@@ -5962,6 +5963,10 @@ let mergeOpenFor = null;     // morph key currently showing its "merge into exis
 let mode = 'entries';        // 'entries' | 'fill' | 'dictionary'
 let domainFilter = '';       // selected semantic-domain tag, '' = no filter
 let typeFilter = '';         // selected entry type (root/affix/clitic), '' = no filter
+                              // (2026-08-22) domainFilter/typeFilter, plus the #tool_lexicon_searchInput
+                              // search box's own value, are shared with the Dictionary tab
+                              // via filteredEntries() — one filter used by both views, not
+                              // two independently-maintained ones.
 let fillLang = null;         // language currently being filled in 'fill' mode
 let dictSort = 'alpha';      // 'alpha' | 'domain' | 'pos' — Dictionary tab grouping, user-selectable
 let dictScope = 'all';       // 'all' | 'one' — Dictionary tab language scope, user-selectable
@@ -6630,25 +6635,60 @@ function onTypeFilterChange_lexicon(){
   renderEntryList_lexicon();
 }
 
-/* ================= entry list ================= */
-function renderEntryList_lexicon(){
-  const list = document.getElementById('tool_lexicon_entryList');
+/* ================= shared Entries-tab filter (search + domain + type) =================
+   Extracted (2026-08-22) so the Dictionary tab can reuse the EXACT same
+   filter the Entries sidebar itself uses, rather than reimplementing it —
+   per explicit request: "a filtered search should also filter the
+   dictionary... in Lexicon if I filter for Affix in All Types, the
+   dictionary should only show the filtered results and export those
+   results. The same is true if the filter is in domains, or Search form
+   or gloss." There's deliberately no separate "Dictionary filter"
+   control — the Entries tab's own search box + domain + type selects ARE
+   the filter, for both views, so there's only ever one filter state to
+   reason about, not two that could drift apart. */
+function activeEntryFilterQuery(){
   // NFC-normalize the typed query — stored forms/allomorphs are always
   // NFC (see SuiteCore.normalizeLexEntry), but a query typed or pasted
   // with a decomposed diacritic (e.g. "o" + combining diaeresis instead
   // of precomposed "ö") won't match otherwise, even though the two are
   // visually identical.
-  const q = SuiteCore.nfc((document.getElementById('tool_lexicon_searchInput').value || '').trim()).toLowerCase();
+  return SuiteCore.nfc((document.getElementById('tool_lexicon_searchInput').value || '').trim()).toLowerCase();
+}
+function entryMatchesActiveFilter(e, q){
+  if(q && !(e.form.toLowerCase().includes(q) ||
+            e.gloss.toLowerCase().includes(q) ||
+            e.allomorphs.some(a => a.toLowerCase().includes(q)))) return false;
+  if(domainFilter && !(e.domains || []).includes(domainFilter)) return false;
+  if(typeFilter && e.type !== typeFilter) return false;
+  return true;
+}
+// Every entry matching the current search/domain/type filter, regardless
+// of the Dictionary-only "Hide from Dictionary" flag — used by the
+// Entries sidebar (which should still show a manually-hidden entry, since
+// that flag is Dictionary-only) and as the base the Dictionary tab then
+// narrows further by that flag.
+function filteredEntries(){
+  const q = activeEntryFilterQuery();
+  return entries.filter(e => entryMatchesActiveFilter(e, q));
+}
+// A short human-readable summary of whatever filter is currently active,
+// or null if none — surfaced in both the Dictionary view's summary line
+// and its Markdown export header, so it's never ambiguous why the
+// Dictionary is showing fewer entries than the full lexicon.
+function activeFilterDescription(){
+  const rawQuery = (document.getElementById('tool_lexicon_searchInput').value || '').trim();
+  const parts = [];
+  if(rawQuery) parts.push('search "' + rawQuery + '"');
+  if(typeFilter) parts.push('type: ' + typeFilter);
+  if(domainFilter) parts.push('domain: ' + domainFilter);
+  return parts.length ? parts.join(', ') : null;
+}
+
+/* ================= entry list ================= */
+function renderEntryList_lexicon(){
+  const list = document.getElementById('tool_lexicon_entryList');
   list.innerHTML = '';
-  const sorted = entries.slice().sort((a, b) => a.form.localeCompare(b.form));
-  let filtered = q
-    ? sorted.filter(e =>
-        e.form.toLowerCase().includes(q) ||
-        e.gloss.toLowerCase().includes(q) ||
-        e.allomorphs.some(a => a.toLowerCase().includes(q)))
-    : sorted;
-  if(domainFilter) filtered = filtered.filter(e => (e.domains || []).includes(domainFilter));
-  if(typeFilter) filtered = filtered.filter(e => e.type === typeFilter);
+  const filtered = filteredEntries().sort((a, b) => a.form.localeCompare(b.form));
   if(!filtered.length){
     list.innerHTML = '<div class="empty-hint">' + (entries.length ? 'No entries match the search.' : 'No entries yet — create one, or promote a candidate from your glossed texts.') + '</div>';
     return;
@@ -7166,8 +7206,21 @@ function dictLangRow(entry, lang){
 // set per-entry in the Entries tab editor) never appear in the Dictionary
 // view or its Markdown export — but are otherwise untouched everywhere else
 // (Entries list, Glosser, Analyze, Fill missing glosses).
+//
+// (2026-08-22) The Dictionary also narrows to whatever search/domain/type
+// filter is currently active on the Entries tab — filteredEntries() is the
+// exact same function the Entries sidebar itself uses, so there's one
+// filter, not two independently-maintained ones. dictionaryFilteredEntries()
+// (BEFORE the hide-flag) is exposed separately from
+// dictionaryEligibleEntries() (AFTER the hide-flag) purely so the summary
+// line below can distinguish "filtered out by search/domain/type" from
+// "individually hidden via the checkbox" instead of collapsing both into
+// one ambiguous count.
+function dictionaryFilteredEntries(){
+  return filteredEntries();
+}
 function dictionaryEligibleEntries(){
-  return entries.filter(e => !e.excludeFromDictionary);
+  return dictionaryFilteredEntries().filter(e => !e.excludeFromDictionary);
 }
 
 function computeDictionaryGroups(){
@@ -7194,11 +7247,30 @@ function computeDictionaryGroups(){
   return [{ heading: null, list: all }];
 }
 
+// Every real-word entry gets an IPA transcription in the Dictionary view
+// (2026-08-22, explicit request: "each form needs an IPA transcription...
+// can lexicon autopopulate these to match the form itself if nothing is
+// set up otherwise?") -- previously this returned '' (no bracket shown at
+// all) whenever either (a) the project has no phoneme-feature setup in
+// Writer/Analyze at all, or (b) it does, but this particular form has no
+// digraph/override that actually changes anything, so the derived IPA
+// would just equal the orthographic form. Neither case is actually an
+// error -- a plain word with no special phonology configured simply IS
+// its own best-available transcription -- so both now fall back to the
+// literal form instead of hiding the field. This changes DISPLAY only:
+// no new curated data, and any form that DOES have real phonology set up
+// still shows its actual derived IPA exactly as before, unchanged.
+// Deliberately still excluded: redup/infix entries, whose "form" is an
+// abstract template (e.g. "~V"), not a real pronounceable word -- showing
+// that literal template in IPA brackets would misrepresent it as an
+// actual transcription, so those entries simply have no IPA field, same
+// as before this change.
 function dictEntryIPA(e){
-  if(!e.form || !ipaCtx || !ipaCtx.phonemeFeatures) return '';
+  if(!e.form) return '';
   if(e.type === 'redup' || e.type === 'infix') return '';
+  if(!ipaCtx || !ipaCtx.phonemeFeatures) return e.form;
   const result = SuiteCore.orthographyWordToIPA(e.form, ipaCtx.graphemes, ipaCtx.phonemeFeatures, ipaCtx.ipaOverrides, ipaCtx.phonemeClassOverrides);
-  return result.text === e.form ? '' : result.text;
+  return result.text || e.form;
 }
 
 function renderDictionary(){
@@ -7208,16 +7280,27 @@ function renderDictionary(){
     view.innerHTML = '<div class="no-entry">No entries yet — add some in the Entries tab first.</div>';
     return;
   }
+  const filterNote = activeFilterDescription();
+  const filteredCount = dictionaryFilteredEntries().length;
+  if(filterNote && !filteredCount){
+    view.innerHTML = '<div class="no-entry">No entries match the current Entries-tab filter (' + escapeHtml(filterNote) + ') — clear or adjust it in the Entries tab to see more here.</div>';
+    return;
+  }
   const eligibleCount = dictionaryEligibleEntries().length;
-  const hiddenCount = entries.length - eligibleCount;
+  const hiddenCount = filteredCount - eligibleCount;
   if(!eligibleCount){
-    view.innerHTML = '<div class="no-entry">Every entry is currently marked "Hide from Dictionary" — nothing to show here yet.</div>';
+    view.innerHTML = '<div class="no-entry">' +
+      (filterNote
+        ? 'Every entry matching the current filter (' + escapeHtml(filterNote) + ') is marked "Hide from Dictionary" — nothing to show here yet.'
+        : 'Every entry is currently marked "Hide from Dictionary" — nothing to show here yet.') +
+      '</div>';
     return;
   }
   const groups = computeDictionaryGroups();
   const scopeLabel = dictScope === 'one' ? ('showing ' + (dictLang || '(no language)')) : 'showing all configured languages';
   const hiddenNote = hiddenCount ? (' · ' + hiddenCount + ' hidden') : '';
-  view.innerHTML = '<div class="dict-summary">' + eligibleCount + ' ' + (eligibleCount === 1 ? 'entry' : 'entries') + ' · ' + scopeLabel + hiddenNote + '</div>'
+  const filterNoteHTML = filterNote ? (' · filtered by ' + escapeHtml(filterNote)) : '';
+  view.innerHTML = '<div class="dict-summary">' + eligibleCount + ' ' + (eligibleCount === 1 ? 'entry' : 'entries') + ' · ' + scopeLabel + hiddenNote + filterNoteHTML + '</div>'
     + groups.map(g=>{
         const heading = g.heading ? '<div class="dict-group-h">' + escapeHtml(g.heading) + '</div>' : '';
         return heading + g.list.map(dictEntryHTML).join('');
@@ -7277,9 +7360,21 @@ function dictionaryScopeLabel(){
 function dictionaryMaxExamplesLabel(){
   return dictMaxExamples == null ? 'Examples: all' : ('Examples: up to ' + dictMaxExamples + ' per entry');
 }
+// Reflects whatever search/domain/type filter is active on the Entries
+// tab (2026-08-22) — same reasoning as the on-screen summary line: the
+// export is a faithful snapshot, so if the view is currently narrowed,
+// the file must say so rather than silently exporting a subset with no
+// record of why it's smaller than the full lexicon.
+function dictionaryFilterLabel(){
+  const note = activeFilterDescription();
+  return note ? ('Filtered by: ' + note) : null;
+}
 function dictionaryMarkdown(){
   const groups = computeDictionaryGroups();
-  const lines = ['# Dictionary', '', '_' + dictionarySortLabel() + ' · ' + dictionaryScopeLabel() + ' · ' + dictionaryMaxExamplesLabel() + '_', ''];
+  const headerParts = [dictionarySortLabel(), dictionaryScopeLabel(), dictionaryMaxExamplesLabel()];
+  const filterLabel = dictionaryFilterLabel();
+  if(filterLabel) headerParts.push(filterLabel);
+  const lines = ['# Dictionary', '', '_' + headerParts.join(' · ') + '_', ''];
   groups.forEach(g=>{
     if(g.heading){ lines.push('## ' + g.heading, ''); }
     g.list.forEach(e=>{ lines.push(dictEntryMarkdown(e), ''); });
