@@ -315,6 +315,29 @@
   #tool_glosser .btn-primary{background:var(--accent);color:#fff;border-color:var(--accent);}
   #tool_glosser .btn-primary:hover{background:var(--accent-lt);border-color:var(--accent-lt);}
 
+  #tool_glosser /* Gloss-example Markdown export modal (2026-08-21) — a small options
+     dialog (include title? one combined block vs one block per sentence?)
+     rather than an instant one-click export, since both choices change the
+     output structure and are easy to want to flip between. */
+  .gx-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:flex;align-items:center;justify-content:center;z-index:998;}
+  #tool_glosser .gx-modal{background:var(--surface);border-radius:var(--r);box-shadow:var(--shadow-lg);width:min(480px,92vw);padding:20px 22px;}
+  #tool_glosser .gx-modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;}
+  #tool_glosser .gx-modal-head h2{font-family:var(--display);font-size:1.15rem;margin:0;}
+  #tool_glosser .gx-modal-sub{font-family:var(--serif);font-size:.82rem;color:var(--text-muted);margin-bottom:16px;line-height:1.4;}
+  #tool_glosser .gx-opt-row{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+  #tool_glosser .gx-opt-row label{display:flex;align-items:center;gap:8px;font-family:var(--serif);font-size:.88rem;cursor:pointer;}
+  #tool_glosser .gx-opt-row .gx-opt-hint{font-family:var(--serif);font-size:.74rem;color:var(--text-muted);margin-left:24px;line-height:1.4;}
+  #tool_glosser .gx-modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:4px;}
+
+  #tool_glosser /* Right-click "copy this one sentence as a gloss example" menu
+     (2026-08-21) -- deliberately a plain positioned menu, not a native
+     <menu>/contextmenu attribute (unreliable cross-browser and can't be
+     styled), shown/hidden manually via showSentenceContextMenu/
+     hideSentenceContextMenu. */
+  .gx-ctx-menu{position:fixed;z-index:999;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow-lg);padding:4px;min-width:220px;}
+  #tool_glosser .gx-ctx-item{display:block;width:100%;text-align:left;background:none;border:none;padding:8px 10px;border-radius:calc(var(--r) - 2px);font-family:var(--serif);font-size:.85rem;color:var(--text);cursor:pointer;}
+  #tool_glosser .gx-ctx-item:hover{background:var(--surface2);}
+
   #tool_glosser /* current-text-only word search — finds sentences containing an exact
      word (formKey match) so a form flagged ambiguous in Analyze can be
      located and re-glossed here, without Analyze itself needing to edit
@@ -583,6 +606,22 @@
   #tool_lexicon .fill-done{text-align:center;padding:40px 0;color:var(--text-muted);font-style:italic;}
 
   #tool_lexicon .domain-tag{display:inline-block;background:var(--accent-bg);color:var(--accent);font-family:var(--mono);font-size:.62rem;padding:2px 8px;border-radius:10px;margin:0 4px 4px 0;}
+
+  #tool_lexicon .dict-group-h{font-family:var(--display);font-size:1.15rem;font-weight:700;color:var(--text);margin:26px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--border-strong);}
+  #tool_lexicon .dict-group-h:first-child{margin-top:0;}
+  #tool_lexicon .dict-entry{padding:14px 20px;}
+  #tool_lexicon .dict-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:6px;}
+  #tool_lexicon .dict-form{font-family:var(--display);font-size:1.15rem;font-weight:700;color:var(--text);}
+  #tool_lexicon .dict-type{font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted);opacity:.7;}
+  #tool_lexicon .dict-pos{font-family:var(--serif);font-size:.82rem;font-style:italic;color:var(--text-muted);}
+  #tool_lexicon .dict-ipa{font-family:var(--mono);font-size:.8rem;color:var(--accent);}
+  #tool_lexicon .dict-alt{font-size:.76rem;color:var(--text-muted);font-style:italic;margin-bottom:6px;}
+  #tool_lexicon .dict-lang-block{font-size:.9rem;color:var(--text);margin-bottom:3px;}
+  #tool_lexicon .dict-lang-block.dict-lang-empty{color:var(--text-muted);font-style:italic;}
+  #tool_lexicon .dict-lang-name{font-family:var(--mono);font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);margin-right:4px;}
+  #tool_lexicon .dict-domains{margin:8px 0 2px;}
+  #tool_lexicon .dict-notes{font-size:.8rem;color:var(--text-muted);font-style:italic;margin-top:8px;}
+  #tool_lexicon .dict-summary{font-size:.8rem;color:var(--text-muted);margin-bottom:18px;}
 
   #tool_lexicon .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:#2c2416;color:#f5f0e8;padding:10px 18px;border-radius:6px;font-family:var(--serif);font-size:13px;opacity:0;pointer-events:none;transition:all .25s;box-shadow:var(--shadow-lg);z-index:99;max-width:min(90vw,520px);}
   #tool_lexicon .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
@@ -1181,6 +1220,7 @@
         </select>
       </label>
       <span class="status-pill status-saved" id="tool_glosser_statusPill">—</span>
+      <button class="btn btn-secondary" onclick="openExportModal_glosser()">Export…</button>
       <button class="btn btn-primary" onclick="saveCurrent_glosser()">Save</button>
       <button class="icon-btn" onclick="reloadCurrent_glosser()" title="Reload from disk (pick up changes made in Writer)">↻</button>
       <button class="icon-btn" id="tool_glosser_themeBtn" onclick="toggleTheme_glosser()" title="Toggle dark mode">🌙</button>
@@ -1196,6 +1236,34 @@
       </div>
     </div>
   </div>
+</div>
+
+<div id="tool_glosser_gxModal" class="gx-modal-overlay" style="display:none;" onclick="if(event.target===this)closeExportModal_glosser()">
+  <div class="gx-modal">
+    <div class="gx-modal-head">
+      <h2>Export sentences</h2>
+      <button class="icon-btn" onclick="closeExportModal_glosser()" title="Close">✕</button>
+    </div>
+    <div class="gx-modal-sub">Writes a Pandoc-style <code>::: {.ex formatGloss=true}</code> block per the old OWL tool's exact syntax — glosses and translation follow whichever language is currently selected above (<span id="tool_glosser_gxLangNote">—</span>).</div>
+    <div class="gx-opt-row">
+      <label><input type="checkbox" id="tool_glosser_gxIncludeTitle" checked> Include text title</label>
+      <div class="gx-opt-hint">The title line right after the opening <code>:::</code> — the current filename (without .txt).</div>
+    </div>
+    <div class="gx-opt-row">
+      <label><input type="radio" name="gxMode" value="combine" checked> Combine all sentences into one block</label>
+      <div class="gx-opt-hint">One <code>:::</code> block total. Every sentence is labeled <code>a.</code> (matching the old tool, which always writes a literal "a." regardless of position), separated by a blank line.</div>
+      <label><input type="radio" name="gxMode" value="independent"> Export each sentence as its own block</label>
+      <div class="gx-opt-hint">A separate <code>:::</code> block per sentence, one after another — no <code>a.</code> label.</div>
+    </div>
+    <div class="gx-modal-actions">
+      <button class="btn btn-secondary" onclick="closeExportModal_glosser()">Cancel</button>
+      <button class="btn btn-primary" onclick="exportGlossMarkdown_glosser()">Export…</button>
+    </div>
+  </div>
+</div>
+
+<div id="tool_glosser_gxCtxMenu" class="gx-ctx-menu" style="display:none;">
+  <button class="gx-ctx-item" onclick="copyActiveSentenceMarkdown_glosser()">Copy as gloss example (Pandoc)</button>
 </div>
 
 <div class="toast" id="tool_glosser_toast"></div>
@@ -1231,6 +1299,7 @@
     <div class="mode-tabs">
       <button class="mode-tab active" id="tool_lexicon_tabEntries" onclick="setMode_lexicon('entries')">Entries</button>
       <button class="mode-tab" id="tool_lexicon_tabFill" onclick="setMode_lexicon('fill')">Fill missing glosses</button>
+      <button class="mode-tab" id="tool_lexicon_tabDictionary" onclick="setMode_lexicon('dictionary')">Dictionary</button>
     </div>
 
     <div id="tool_lexicon_entriesSidebar">
@@ -1252,6 +1321,30 @@
         <select id="tool_lexicon_fillLangSelect" onchange="onFillLangChange_lexicon()"></select>
       </div>
       <div class="sidebar-actions">
+        <button class="side-btn" onclick="chooseFolder()">Switch folder…</button>
+      </div>
+    </div>
+
+    <div id="tool_lexicon_dictionarySidebar" style="display:none;">
+      <div class="search-wrap">
+        <label style="display:block;font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(245,240,232,.4);margin-bottom:6px;">Sort by</label>
+        <select id="tool_lexicon_dictSortSelect" onchange="onDictSortChange_lexicon()">
+          <option value="alpha">Alphabetical (headword)</option>
+          <option value="domain">By semantic domain</option>
+          <option value="pos">By part of speech</option>
+        </select>
+        <label style="display:block;font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(245,240,232,.4);margin:12px 0 6px;">Languages shown</label>
+        <select id="tool_lexicon_dictScopeSelect" onchange="onDictScopeChange_lexicon()">
+          <option value="all">All configured languages</option>
+          <option value="one">One language only</option>
+        </select>
+        <select id="tool_lexicon_dictLangSelect" onchange="onDictLangChange_lexicon()" style="display:none;"></select>
+        <label style="display:block;font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em;color:rgba(245,240,232,.4);margin:12px 0 6px;">Max examples per entry</label>
+        <input type="number" id="tool_lexicon_dictMaxExamplesInput" min="0" step="1" placeholder="All" oninput="onDictMaxExamplesChange_lexicon()">
+        <span style="display:block;font-family:var(--serif);font-size:.68rem;font-style:italic;color:rgba(245,240,232,.4);margin-top:4px;">blank = show every example; only affects this view/export, not the Entries tab</span>
+      </div>
+      <div class="sidebar-actions">
+        <button class="side-btn" onclick="exportDictionaryMarkdown_lexicon()">⬇ Export as Markdown</button>
         <button class="side-btn" onclick="chooseFolder()">Switch folder…</button>
       </div>
     </div>
@@ -1297,6 +1390,11 @@
               <label>&nbsp;</label>
               <label class="loanword-chk"><input type="checkbox" id="tool_lexicon_fLoanword"> Loanword</label>
               <span class="hint">excluded from Analyze's Phonology tab by default — its sounds aren't part of the native inventory</span>
+            </div>
+            <div class="field small">
+              <label>&nbsp;</label>
+              <label class="loanword-chk"><input type="checkbox" id="tool_lexicon_fExcludeDictionary"> Hide from Dictionary</label>
+              <span class="hint">stays in the lexicon, Glosser, and Analyze as normal — just left out of the Dictionary tab's view and export</span>
             </div>
           </div>
           <div class="frow">
@@ -1350,6 +1448,9 @@
       </div>
       <div class="lex-page" id="tool_lexicon_fillPage" style="display:none;">
         <div id="tool_lexicon_fillView"></div>
+      </div>
+      <div class="lex-page" id="tool_lexicon_dictionaryPage" style="display:none;">
+        <div id="tool_lexicon_dictionaryView"></div>
       </div>
     </div>
   </div>
@@ -2867,7 +2968,7 @@ function updateStatus(state){
 function scheduleAutosave(){
   setDirty(true);
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveCurrent, 1400);
+  saveTimer = setTimeout(saveCurrent_writer, 1400);
 }
 
 function reconstructPlainText(){
@@ -4124,6 +4225,16 @@ function buildSentenceCard(num, pIdx, sIdx, s){
   const card = document.createElement('div');
   card.className = 'sent-card';
   card.dataset.sid = s.id;
+  // Right-click anywhere on the card (including the contentEditable
+  // sentence text, whose own native context menu we deliberately
+  // suppress here) offers a "copy this one sentence as a gloss example"
+  // shortcut -- the single-sentence counterpart to the Export... button,
+  // per the user's own explicit deferral when the general export was
+  // first requested.
+  card.addEventListener('contextmenu', (ev) => {
+    ev.preventDefault();
+    showSentenceContextMenu(ev, s.id);
+  });
 
   const g = glossData.get(s.id);
   const hasGloss = g && g.tokens.some(t => (t.gl && t.gl.trim()) || (t.mb && t.mb.trim()));
@@ -4853,6 +4964,256 @@ function deriveGlossForToken(gt, lang){
   return SuiteCore.reglossLine(mb, parts);
 }
 
+/* ================= gloss-example Markdown export (2026-08-21) =================
+   Replicates the old Java tool's exact export syntax -- a Pandoc-style
+   fenced div (`::: {.ex formatGloss=true}`) with pipe-prefixed "line
+   block" lines -- so an external Lua filter that depends on that exact
+   syntax keeps working. Ground truth is
+   CorpusInterlinearAnnotator - Copy.java's exportExampleSentencesMarkdown/
+   writeSentenceMarkdown/getExportTitleForCurrentText, not just the user's
+   own paraphrase of it; two things confirmed straight from that source:
+   (1) the per-sentence "a." label is ALWAYS literal "a." -- the label
+   char the Java method takes is passed but never actually used in the
+   body -- so combined-mode output never advances to b./c./etc, and (2)
+   the title falls back to the filename (minus .txt) when there's no
+   separate stored title, which is the only title concept this JS suite
+   has, so that's what's used here too.
+   Two independently toggleable options, because both change the output
+   structure and a user will want to flip between them per export: whether
+   to include the title line, and whether every sentence goes in one
+   shared ::: block (each prefixed with "a.", blank line between) or each
+   sentence gets its own separate ::: block (no "a." label at all).
+   Glosses/translation always follow glossLang, the SAME single active
+   display language the on-screen gloss table is currently showing --
+   never a separate export-only language choice -- so what you export
+   always matches what you were just looking at.
+   `gxScope`/`gxTargetSentenceId` exist now, unused by any UI yet, only so
+   the deferred right-click "export just this one sentence" entry point
+   the user described can call the exact same buildExportMarkdown() with a
+   one-sentence array later, instead of needing a parallel code path. */
+let gxScope = 'all'; // 'all' = every sentence in the open text (only mode wired to UI so far)
+let gxTargetSentenceId = null; // reserved for the future right-click single-sentence export
+
+function exportTitleText(){
+  return currentName ? currentName.replace(/\.txt$/i, '') : '';
+}
+
+// One token's SEGMENTED-line piece: its stored morpheme-break if present,
+// else just the surface form (an unsegmented/unglossed word still needs a
+// slot in the line, same as it does on-screen in the tok-row).
+function tokenSegPiece(t){
+  return (t.mb && t.mb.trim()) ? t.mb.trim() : t.form;
+}
+
+// One token's GLOSSES-line piece in the currently active display language.
+// Primary language: the stored per-token gl, same as every other primary-
+// language view in this tool. Non-primary language: reuses
+// deriveGlossForToken so the export matches exactly what the on-screen
+// derived-gloss banner/row is showing, not a second independent
+// derivation that could disagree with it.
+function tokenGlossPiece(t){
+  if(!glossLang || glossLang === primaryGlossLang()){
+    return (t.gl && t.gl.trim()) ? t.gl.trim() : '·';
+  }
+  return deriveGlossForToken(t, glossLang) || '·';
+}
+
+// The 4 export lines (SENTENCE / SEGMENTED SENTENCE / GLOSSES /
+// TRANSLATION) for one sentence, in the old tool's exact order. Falls
+// back to plain tokenization with empty mb/gl for a sentence that's never
+// been glossed at all, so an ungGlossed sentence still exports something
+// sensible instead of throwing.
+function sentenceExportLines(s){
+  const g = glossData.get(s.id);
+  const tokens = (g && g.tokens && g.tokens.length)
+    ? g.tokens
+    : SuiteCore.tokenize(s.text).map(f => ({ form: f, mb: '', gl: '' }));
+  const segLine = tokens.map(tokenSegPiece).join(' ');
+  const glossLine = tokens.map(tokenGlossPiece).join(' ');
+  const tr = translationsData.get(s.id) || {};
+  const trLine = (glossLang && tr[glossLang]) ? tr[glossLang].trim() : '';
+  return { sentence: s.text, segmented: segLine, glosses: glossLine, translation: trLine };
+}
+
+// Every sentence in the open text, in document order -- flattens
+// `paragraphs` the same way renderAll's own render loop walks it, so
+// export order always matches top-to-bottom what's on screen.
+function allSentencesInOrder(){
+  const out = [];
+  paragraphs.forEach(para => para.sentences.forEach(s => out.push(s)));
+  return out;
+}
+
+// One sentence's 4 lines, optionally preceded by the literal "a." label
+// line (combined mode only -- see this block's own header comment on why
+// it's always literal "a." and never advances).
+function writeSentenceBlockLines(lines, includeLabel){
+  const out = [];
+  if(includeLabel) out.push('a.');
+  out.push('| ' + lines.sentence);
+  out.push('| ' + lines.segmented);
+  out.push('| ' + lines.glosses);
+  out.push('| ' + lines.translation);
+  return out;
+}
+
+// Assembles the full .md text. `opts.combine` true = one ::: block, every
+// sentence "a."-labeled and separated by a blank line (no blank line after
+// the very last one, matching the Java source's own blankAfter logic);
+// false = one separate ::: block per sentence, no label, blocks separated
+// by a blank line between them.
+function buildExportMarkdown(sentences, opts){
+  const title = opts.includeTitle ? exportTitleText() : '';
+  if(opts.combine){
+    const lines = ['::: {.ex formatGloss=true}'];
+    if(title) lines.push(title);
+    lines.push(''); // blank line always separates the directive/title line from content
+    sentences.forEach((s, i) => {
+      writeSentenceBlockLines(sentenceExportLines(s), true).forEach(l => lines.push(l));
+      if(i < sentences.length - 1) lines.push('');
+    });
+    lines.push(':::');
+    return lines.join('\n') + '\n';
+  }
+  const blocks = sentences.map(s => {
+    const lines = ['::: {.ex formatGloss=true}'];
+    if(title) lines.push(title);
+    lines.push('');
+    writeSentenceBlockLines(sentenceExportLines(s), false).forEach(l => lines.push(l));
+    lines.push(':::');
+    return lines.join('\n');
+  });
+  return blocks.join('\n\n') + '\n';
+}
+
+function downloadMarkdown(text, filename){
+  const blob = new Blob([text], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function openExportModal_glosser(){
+  if(!currentName){ toastError('Open a text first.'); return; }
+  const langNote = document.getElementById('tool_glosser_gxLangNote');
+  if(langNote) langNote.textContent = glossLang || primaryGlossLang() || '(no language set)';
+  document.getElementById('tool_glosser_gxModal').style.display = 'flex';
+}
+function closeExportModal_glosser(){
+  document.getElementById('tool_glosser_gxModal').style.display = 'none';
+}
+function exportGlossMarkdown_glosser(){
+  const includeTitle = document.getElementById('tool_glosser_gxIncludeTitle').checked;
+  const modeEl = __owlRoot.querySelector('input[name="gxMode"]:checked');
+  const combine = !modeEl || modeEl.value === 'combine';
+  const sentences = allSentencesInOrder();
+  if(!sentences.length){ toastError('This text has no sentences to export.'); return; }
+  const md = buildExportMarkdown(sentences, { includeTitle, combine });
+  const base = exportTitleText() || 'export';
+  downloadMarkdown(md, base + '.md');
+  closeExportModal_glosser();
+  toast('Exported ' + base + '.md');
+}
+
+/* ================= single-sentence copy-to-clipboard (2026-08-21) =================
+   The deferred right-click feature: "once this is worked out right
+   clicking on a sentence will allow exporting a single specific sentence
+   using this format." The user later clarified this should be
+   copy/paste, not a file download -- so this reuses the exact same
+   buildExportMarkdown() the file export does (one-element sentence
+   array, `combine: false`, i.e. the independent single-block shape --
+   there's nothing to "combine" with only one sentence, and independent
+   mode is already the no-"a."-label shape that reads naturally as a
+   single standalone example) and writes the result to the clipboard
+   instead of downloading a file. `includeTitle` deliberately mirrors
+   whatever the full Export... dialog's own checkbox is currently set to,
+   so the two entry points always agree instead of needing their own
+   separate setting to keep in sync. */
+let gxCtxSentenceId = null; // which sentence the currently-open context menu targets
+
+function currentIncludeTitleSetting(){
+  const cb = document.getElementById('tool_glosser_gxIncludeTitle');
+  return cb ? cb.checked : true;
+}
+
+// Writes text to the clipboard, trying the modern async Clipboard API
+// first and falling back to the old execCommand('copy')-via-hidden-
+// textarea trick for browsers/contexts where the former is unavailable
+// or blocked (e.g. non-HTTPS, some embedded/iframe contexts) -- returns
+// whether it actually succeeded so the caller can report failure
+// honestly instead of always claiming success.
+async function copyTextToClipboard(text){
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  }catch(e){ /* fall through to the legacy path below */ }
+  try{
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    const ok = document.execCommand('copy');
+    ta.remove();
+    return !!ok;
+  }catch(e){ return false; }
+}
+
+function showSentenceContextMenu(ev, sentenceId){
+  gxCtxSentenceId = sentenceId;
+  const menu = document.getElementById('tool_glosser_gxCtxMenu');
+  menu.style.display = 'block';
+  // Clamp so the menu can't render off the right/bottom edge of the
+  // viewport when right-clicking near an edge.
+  const menuWidth = 240, menuHeight = 44;
+  const x = Math.min(ev.clientX, window.innerWidth - menuWidth - 8);
+  const y = Math.min(ev.clientY, window.innerHeight - menuHeight - 8);
+  menu.style.left = Math.max(4, x) + 'px';
+  menu.style.top = Math.max(4, y) + 'px';
+}
+function hideSentenceContextMenu(){
+  const menu = document.getElementById('tool_glosser_gxCtxMenu');
+  if(menu) menu.style.display = 'none';
+  gxCtxSentenceId = null;
+}
+// Dismiss on an outside click, on scroll, or on Escape -- standard
+// context-menu manners. These are harmless no-ops when the menu is
+// already hidden (true whenever a different tool tab is active in the
+// merged suite), so no window.__owlActiveTool guard is needed here the
+// way the Ctrl+S-style shortcut listeners elsewhere in this file need one.
+document.addEventListener('click', (ev) => {
+  const menu = document.getElementById('tool_glosser_gxCtxMenu');
+  if(menu && menu.style.display !== 'none' && !menu.contains(ev.target)) hideSentenceContextMenu();
+});
+document.addEventListener('scroll', () => hideSentenceContextMenu(), true);
+document.addEventListener('keydown', (ev) => {
+  if(window.__owlActiveTool !== 'glosser') return;
+  if(ev.key === 'Escape') hideSentenceContextMenu();
+});
+
+async function copyActiveSentenceMarkdown_glosser(){
+  const sentenceId = gxCtxSentenceId;
+  hideSentenceContextMenu();
+  if(!sentenceId) return;
+  const s = allSentencesInOrder().find(x => x.id === sentenceId);
+  if(!s){ toastError('That sentence could not be found — the text may have changed.'); return; }
+  const md = buildExportMarkdown([s], { includeTitle: currentIncludeTitleSetting(), combine: false });
+  const ok = await copyTextToClipboard(md);
+  if(ok) toast('Copied gloss example to clipboard.');
+  else toastError('Could not copy to the clipboard — your browser may be blocking it.');
+}
+
 /* ---- suggestion lookups: live session first, then folder memory ----
    Checking the current text's in-memory glosses first means a word you
    glossed two sentences ago is suggested immediately (latest analysis
@@ -5314,7 +5675,7 @@ function updateStatus(state){
 function scheduleAutosave(){
   setDirty(true);
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveCurrent, 1400);
+  saveTimer = setTimeout(saveCurrent_glosser, 1400);
 }
 
 // Rejected analyses are corpus-wide, not part of the current text's save
@@ -5523,7 +5884,11 @@ document.addEventListener('visibilitychange', ()=>{ if(document.visibilityState 
   // everything else in this tool stays fully private to this IIFE.
   window.clearSearch_glosser = clearSearch_glosser;
   window.closeDiag_glosser = closeDiag_glosser;
+  window.closeExportModal_glosser = closeExportModal_glosser;
+  window.copyActiveSentenceMarkdown_glosser = copyActiveSentenceMarkdown_glosser;
+  window.exportGlossMarkdown_glosser = exportGlossMarkdown_glosser;
   window.loadFolder_glosser = loadFolder_glosser;
+  window.openExportModal_glosser = openExportModal_glosser;
   window.reloadCurrent_glosser = reloadCurrent_glosser;
   window.saveCurrent_glosser = saveCurrent_glosser;
   window.setGlossLang_glosser = setGlossLang_glosser;
@@ -5594,10 +5959,15 @@ let currentId = null;        // id of the entry open in the editor
 let folderLanguages = [];    // from writer.settings.json — definition fields per language
 let candidates = [];         // derived: glossed morphs not yet in the lexicon
 let mergeOpenFor = null;     // morph key currently showing its "merge into existing entry" picker
-let mode = 'entries';        // 'entries' | 'fill'
+let mode = 'entries';        // 'entries' | 'fill' | 'dictionary'
 let domainFilter = '';       // selected semantic-domain tag, '' = no filter
 let typeFilter = '';         // selected entry type (root/affix/clitic), '' = no filter
 let fillLang = null;         // language currently being filled in 'fill' mode
+let dictSort = 'alpha';      // 'alpha' | 'domain' | 'pos' — Dictionary tab grouping, user-selectable
+let dictScope = 'all';       // 'all' | 'one' — Dictionary tab language scope, user-selectable
+let dictLang = null;         // the single language shown when dictScope === 'one'
+let dictMaxExamples = null;  // integer cap on corpus examples shown per entry in the
+                              // Dictionary view/export only, null = unlimited (default)
 let isDirty = false;
 let saveTimer = null;
 let corpusTexts = [];        // whole-corpus scan for derived example sentences (never persisted —
@@ -5731,6 +6101,8 @@ async function loadFolder_lexicon(handle){
   renderCandidates();
   renderFillLangOptions();
   renderFillGaps();
+  renderDictLangOptions();
+  renderDictionary();
   updateCounts();
   setDirty(false);
 }
@@ -6310,6 +6682,7 @@ function renderEditor(){
   updateFormIPAHint();
   document.getElementById('tool_lexicon_fPos').value = e.pos;
   document.getElementById('tool_lexicon_fLoanword').checked = !!e.loanword;
+  document.getElementById('tool_lexicon_fExcludeDictionary').checked = !!e.excludeFromDictionary;
   document.getElementById('tool_lexicon_fAllomorphs').value = e.allomorphs.filter(a => a !== e.form).join(', ');
   document.getElementById('tool_lexicon_fDomains').value = (e.domains || []).join(', ');
   document.getElementById('tool_lexicon_fNotes').value = e.notes;
@@ -6479,6 +6852,7 @@ function fieldChanged(){
   }
   e.pos = document.getElementById('tool_lexicon_fPos').value.trim();
   e.loanword = document.getElementById('tool_lexicon_fLoanword').checked;
+  e.excludeFromDictionary = document.getElementById('tool_lexicon_fExcludeDictionary').checked;
   const extra = document.getElementById('tool_lexicon_fAllomorphs').value.split(',').map(a => SuiteCore.nfc(a.trim())).filter(Boolean);
   e.allomorphs = Array.from(new Set([e.form, ...extra].filter(Boolean)));
   // Stem alternants (2026-08-09): read back only when the field is
@@ -6516,7 +6890,7 @@ function fieldChanged(){
   renderEntryList_lexicon();
   scheduleAutosave();
 }
-['tool_lexicon_fForm','tool_lexicon_fType','tool_lexicon_fPos','tool_lexicon_fLoanword','tool_lexicon_fAllomorphs','tool_lexicon_fDomains','tool_lexicon_fNotes'].forEach(id=>{
+['tool_lexicon_fForm','tool_lexicon_fType','tool_lexicon_fPos','tool_lexicon_fLoanword','tool_lexicon_fExcludeDictionary','tool_lexicon_fAllomorphs','tool_lexicon_fDomains','tool_lexicon_fNotes'].forEach(id=>{
   document.getElementById(id).addEventListener('input', fieldChanged);
   document.getElementById(id).addEventListener('change', fieldChanged);
 });
@@ -6688,15 +7062,273 @@ function setMode_lexicon(m){
   mode = m;
   updateModeUI();
   if(m === 'fill'){ renderFillLangOptions(); renderFillGaps(); }
+  else if(m === 'dictionary'){
+    document.getElementById('tool_lexicon_docTitle').textContent = 'Dictionary';
+    document.getElementById('tool_lexicon_docSub').textContent = '';
+    if(dictScope === 'one') renderDictLangOptions();
+    renderDictionary();
+  }
   else{ document.getElementById('tool_lexicon_docTitle').textContent = 'Lexicon'; updateCounts(); }
 }
 function updateModeUI(){
   document.getElementById('tool_lexicon_tabEntries').classList.toggle('active', mode === 'entries');
   document.getElementById('tool_lexicon_tabFill').classList.toggle('active', mode === 'fill');
+  document.getElementById('tool_lexicon_tabDictionary').classList.toggle('active', mode === 'dictionary');
   document.getElementById('tool_lexicon_entriesSidebar').style.display = mode === 'entries' ? '' : 'none';
   document.getElementById('tool_lexicon_fillSidebar').style.display = mode === 'fill' ? '' : 'none';
+  document.getElementById('tool_lexicon_dictionarySidebar').style.display = mode === 'dictionary' ? '' : 'none';
   document.getElementById('tool_lexicon_entriesPage').style.display = mode === 'entries' ? '' : 'none';
   document.getElementById('tool_lexicon_fillPage').style.display = mode === 'fill' ? '' : 'none';
+  document.getElementById('tool_lexicon_dictionaryPage').style.display = mode === 'dictionary' ? '' : 'none';
+}
+
+/* ================= dictionary view + Markdown export =================
+   Built 2026-08-21 per explicit request: a read-only, dictionary-style
+   rendering of the whole lexicon, plus a Markdown export that is always a
+   snapshot of whatever the view controls are CURRENTLY set to (not a
+   separately-configured export) — both the sort order (alphabetical /
+   domain / part of speech) and the language scope (all configured
+   languages / one language) are user-selectable, per explicit answers to
+   clarifying questions rather than a fixed default for either. Corpus
+   examples reuse the existing findCorpusExamples() derivation unchanged —
+   no new example-finding logic. */
+function onDictSortChange_lexicon(){
+  dictSort = document.getElementById('tool_lexicon_dictSortSelect').value;
+  renderDictionary();
+}
+function onDictScopeChange_lexicon(){
+  dictScope = document.getElementById('tool_lexicon_dictScopeSelect').value;
+  document.getElementById('tool_lexicon_dictLangSelect').style.display = dictScope === 'one' ? '' : 'none';
+  if(dictScope === 'one') renderDictLangOptions();
+  renderDictionary();
+}
+function onDictLangChange_lexicon(){
+  dictLang = document.getElementById('tool_lexicon_dictLangSelect').value;
+  renderDictionary();
+}
+// Blank, 0, or a non-numeric value all mean "unlimited" — only a positive
+// integer actually caps anything. Deliberately only ever consulted from the
+// Dictionary tab's own render/export functions (dictEntryHTML,
+// dictEntryMarkdown) — findCorpusExamples() itself and the Entries tab's
+// renderCorpusExamples() are never touched, so the Entries editor still
+// always shows every corpus example for an entry, unlimited.
+function onDictMaxExamplesChange_lexicon(){
+  const raw = document.getElementById('tool_lexicon_dictMaxExamplesInput').value.trim();
+  const n = parseInt(raw, 10);
+  dictMaxExamples = (raw !== '' && Number.isFinite(n) && n > 0) ? n : null;
+  renderDictionary();
+}
+// Applies the Dictionary-only example cap to an examples array, returning
+// both the (possibly truncated) list to render and how many were cut off.
+function limitDictExamples(examples){
+  if(dictMaxExamples == null || examples.length <= dictMaxExamples){
+    return { shown: examples, hiddenCount: 0 };
+  }
+  return { shown: examples.slice(0, dictMaxExamples), hiddenCount: examples.length - dictMaxExamples };
+}
+function renderDictLangOptions(){
+  const sel = document.getElementById('tool_lexicon_dictLangSelect');
+  if(!sel) return;
+  const langs = allKnownLanguages();
+  if(!langs.length){ sel.innerHTML = '<option value="">(no languages yet)</option>'; dictLang = null; return; }
+  if(!dictLang || !langs.includes(dictLang)) dictLang = folderLanguages[0] || langs[0];
+  sel.innerHTML = langs.map(l => '<option value="' + escapeHtml(l) + '"' + (l === dictLang ? ' selected' : '') + '>' + escapeHtml(l) + '</option>').join('');
+}
+
+// The language rows to show for one entry, given the current scope
+// control. 'all' skips a language for THIS entry if it has neither a
+// gloss nor a definition there (avoids every entry listing every
+// project language with a string of em-dashes); 'one' always shows the
+// chosen language, even empty, since the user explicitly picked it.
+function entryLangBlocks(entry){
+  if(dictScope === 'one'){
+    const lang = dictLang || allKnownLanguages()[0] || null;
+    if(!lang) return [];
+    return [dictLangRow(entry, lang)];
+  }
+  return allKnownLanguages()
+    .map(l => dictLangRow(entry, l))
+    .filter(b => b.glosses.length || b.definition);
+}
+function dictLangRow(entry, lang){
+  const glosses = isPrimaryLang(lang) ? (entry.glossOptions || []) : ((entry.glossesByLang || {})[lang] || []);
+  const definition = (entry.definitions || {})[lang] || '';
+  return { lang, glosses, definition };
+}
+
+// Groups entries per the current sort control. Alphabetical is one flat
+// group; domain and part-of-speech each produce one group per distinct
+// value (plus a trailing catch-all for entries missing that field) — an
+// entry with more than one domain legitimately appears in more than one
+// domain group, matching how the existing domain filter already treats
+// multi-domain entries.
+// Entries the user has flagged "Hide from Dictionary" (excludeFromDictionary,
+// set per-entry in the Entries tab editor) never appear in the Dictionary
+// view or its Markdown export — but are otherwise untouched everywhere else
+// (Entries list, Glosser, Analyze, Fill missing glosses).
+function dictionaryEligibleEntries(){
+  return entries.filter(e => !e.excludeFromDictionary);
+}
+
+function computeDictionaryGroups(){
+  const all = dictionaryEligibleEntries().sort((a, b) => a.form.localeCompare(b.form));
+  if(dictSort === 'domain'){
+    const groups = allKnownDomains().map(d => ({
+      heading: d,
+      list: all.filter(e => (e.domains || []).includes(d))
+    })).filter(g => g.list.length);
+    const noDomain = all.filter(e => !(e.domains || []).length);
+    if(noDomain.length) groups.push({ heading: '(no domain)', list: noDomain });
+    return groups;
+  }
+  if(dictSort === 'pos'){
+    const posValues = Array.from(new Set(all.map(e => (e.pos || '').trim()).filter(Boolean))).sort((a, b) => a.localeCompare(b));
+    const groups = posValues.map(p => ({
+      heading: p,
+      list: all.filter(e => (e.pos || '').trim() === p)
+    }));
+    const noPos = all.filter(e => !(e.pos || '').trim());
+    if(noPos.length) groups.push({ heading: '(no part of speech)', list: noPos });
+    return groups;
+  }
+  return [{ heading: null, list: all }];
+}
+
+function dictEntryIPA(e){
+  if(!e.form || !ipaCtx || !ipaCtx.phonemeFeatures) return '';
+  if(e.type === 'redup' || e.type === 'infix') return '';
+  const result = SuiteCore.orthographyWordToIPA(e.form, ipaCtx.graphemes, ipaCtx.phonemeFeatures, ipaCtx.ipaOverrides, ipaCtx.phonemeClassOverrides);
+  return result.text === e.form ? '' : result.text;
+}
+
+function renderDictionary(){
+  const view = document.getElementById('tool_lexicon_dictionaryView');
+  if(!view) return;
+  if(!entries.length){
+    view.innerHTML = '<div class="no-entry">No entries yet — add some in the Entries tab first.</div>';
+    return;
+  }
+  const eligibleCount = dictionaryEligibleEntries().length;
+  const hiddenCount = entries.length - eligibleCount;
+  if(!eligibleCount){
+    view.innerHTML = '<div class="no-entry">Every entry is currently marked "Hide from Dictionary" — nothing to show here yet.</div>';
+    return;
+  }
+  const groups = computeDictionaryGroups();
+  const scopeLabel = dictScope === 'one' ? ('showing ' + (dictLang || '(no language)')) : 'showing all configured languages';
+  const hiddenNote = hiddenCount ? (' · ' + hiddenCount + ' hidden') : '';
+  view.innerHTML = '<div class="dict-summary">' + eligibleCount + ' ' + (eligibleCount === 1 ? 'entry' : 'entries') + ' · ' + scopeLabel + hiddenNote + '</div>'
+    + groups.map(g=>{
+        const heading = g.heading ? '<div class="dict-group-h">' + escapeHtml(g.heading) + '</div>' : '';
+        return heading + g.list.map(dictEntryHTML).join('');
+      }).join('');
+}
+
+function dictEntryHTML(e){
+  const ipa = dictEntryIPA(e);
+  const ipaHTML = ipa ? ' <span class="dict-ipa">[' + escapeHtml(ipa) + ']</span>' : '';
+  const posHTML = e.pos ? ' <span class="dict-pos">' + escapeHtml(e.pos) + '</span>' : '';
+  const altForms = (e.allomorphs || []).filter(a => a !== e.form);
+  const altHTML = altForms.length ? '<div class="dict-alt">also: ' + altForms.map(escapeHtml).join(', ') + '</div>' : '';
+  const langBlocks = entryLangBlocks(e);
+  const langHTML = langBlocks.length
+    ? langBlocks.map(b=>{
+        const glossText = b.glosses.length ? escapeHtml(b.glosses.join('; ')) : '—';
+        const defText = b.definition ? ' — ' + escapeHtml(b.definition) : '';
+        return '<div class="dict-lang-block"><span class="dict-lang-name">' + escapeHtml(b.lang) + ':</span>' + glossText + defText + '</div>';
+      }).join('')
+    : '<div class="dict-lang-block dict-lang-empty">(no gloss recorded)</div>';
+  const domainsHTML = (e.domains || []).length
+    ? '<div class="dict-domains">' + e.domains.map(d => '<span class="domain-tag">' + escapeHtml(d) + '</span>').join('') + '</div>'
+    : '';
+  const notesHTML = e.notes ? '<div class="dict-notes">' + escapeHtml(e.notes) + '</div>' : '';
+  const { shown: shownExamples, hiddenCount: hiddenExampleCount } = limitDictExamples(findCorpusExamples(e));
+  const exHTML = shownExamples.length
+    ? '<div class="ex-list">' + shownExamples.map(ex=>{
+        const trLine = Object.entries(ex.translations).map(([lang, v]) =>
+          '<span class="ex-tr-lang">' + escapeHtml(lang) + ':</span>' + escapeHtml(v)
+        ).join('  ');
+        return '<div class="ex-row">'
+          + '<div class="ex-text">' + escapeHtml(ex.text) + '</div>'
+          + (trLine ? '<div class="ex-tr">' + trLine + '</div>' : '')
+          + '<div class="ex-src">' + escapeHtml(ex.textName) + '</div>'
+          + '</div>';
+      }).join('') + (hiddenExampleCount ? '<div class="ex-src">+' + hiddenExampleCount + ' more not shown</div>' : '') + '</div>'
+    : '';
+  return '<div class="card dict-entry">'
+    + '<div class="dict-head"><span class="dict-form">' + escapeHtml(e.form || '(blank)') + '</span>'
+    + ' <span class="dict-type">' + escapeHtml(e.type) + '</span>' + posHTML + ipaHTML + '</div>'
+    + altHTML + langHTML + domainsHTML + notesHTML + exHTML
+    + '</div>';
+}
+
+// Markdown export — reuses the same grouping/language/example logic as
+// the on-screen view above (computeDictionaryGroups, entryLangBlocks,
+// findCorpusExamples), so the exported file is always a snapshot of
+// whatever the Dictionary tab's controls are set to right now.
+function dictionarySortLabel(){
+  return dictSort === 'domain' ? 'Grouped by semantic domain'
+       : dictSort === 'pos' ? 'Grouped by part of speech'
+       : 'Alphabetical by headword';
+}
+function dictionaryScopeLabel(){
+  return dictScope === 'one' ? ('Language: ' + (dictLang || '(none)')) : 'Languages: all configured project languages';
+}
+function dictionaryMaxExamplesLabel(){
+  return dictMaxExamples == null ? 'Examples: all' : ('Examples: up to ' + dictMaxExamples + ' per entry');
+}
+function dictionaryMarkdown(){
+  const groups = computeDictionaryGroups();
+  const lines = ['# Dictionary', '', '_' + dictionarySortLabel() + ' · ' + dictionaryScopeLabel() + ' · ' + dictionaryMaxExamplesLabel() + '_', ''];
+  groups.forEach(g=>{
+    if(g.heading){ lines.push('## ' + g.heading, ''); }
+    g.list.forEach(e=>{ lines.push(dictEntryMarkdown(e), ''); });
+  });
+  return lines.join('\n').trim() + '\n';
+}
+function dictEntryMarkdown(e){
+  const ipa = dictEntryIPA(e);
+  const ipaText = ipa ? ' [' + ipa + ']' : '';
+  const posText = e.pos ? ' *' + e.pos + '*' : '';
+  const lines = ['### ' + (e.form || '(blank)') + ipaText + posText + ' (' + e.type + ')'];
+  const altForms = (e.allomorphs || []).filter(a => a !== e.form);
+  if(altForms.length) lines.push('*also:* ' + altForms.join(', '));
+  const langBlocks = entryLangBlocks(e);
+  if(langBlocks.length){
+    langBlocks.forEach(b=>{
+      const glossText = b.glosses.length ? b.glosses.join('; ') : '—';
+      const defText = b.definition ? ' — ' + b.definition : '';
+      lines.push('- **' + b.lang + ':** ' + glossText + defText);
+    });
+  }else{
+    lines.push('- (no gloss recorded)');
+  }
+  if((e.domains || []).length) lines.push('*Domains:* ' + e.domains.join(', '));
+  if(e.notes) lines.push('*Notes:* ' + e.notes);
+  const { shown: shownExamples, hiddenCount: hiddenExampleCount } = limitDictExamples(findCorpusExamples(e));
+  if(shownExamples.length){
+    lines.push('', 'Examples:');
+    shownExamples.forEach(ex=>{
+      const trText = Object.entries(ex.translations).map(([lang, v]) => lang + ': ' + v).join('; ');
+      lines.push('- ' + ex.text + (trText ? '  \n  ' + trText : '') + '  \n  _(' + ex.textName + ')_');
+    });
+    if(hiddenExampleCount) lines.push('- _(+' + hiddenExampleCount + ' more not shown)_');
+  }
+  return lines.join('\n');
+}
+function exportDictionaryMarkdown_lexicon(){
+  if(!entries.length){ toastError('Nothing to export yet — the lexicon is empty.'); return; }
+  const md = dictionaryMarkdown();
+  const blob = new Blob([md], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'dictionary.md';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  toast('Exported dictionary.md');
 }
 
 /* ================= fill missing glosses =================
@@ -6816,7 +7448,7 @@ function updateStatus(state){
 function scheduleAutosave(){
   setDirty(true);
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(saveLexicon, 1400);
+  saveTimer = setTimeout(saveLexicon_lexicon, 1400);
 }
 async function saveLexicon_lexicon(){
   clearTimeout(saveTimer);
@@ -6855,8 +7487,13 @@ window.addEventListener('beforeunload', (e)=>{
   // Exposed to the shell / inline HTML event-handler attributes --
   // everything else in this tool stays fully private to this IIFE.
   window.deleteCurrentEntry_lexicon = deleteCurrentEntry_lexicon;
+  window.exportDictionaryMarkdown_lexicon = exportDictionaryMarkdown_lexicon;
   window.loadFolder_lexicon = loadFolder_lexicon;
   window.newEntry_lexicon = newEntry_lexicon;
+  window.onDictLangChange_lexicon = onDictLangChange_lexicon;
+  window.onDictMaxExamplesChange_lexicon = onDictMaxExamplesChange_lexicon;
+  window.onDictScopeChange_lexicon = onDictScopeChange_lexicon;
+  window.onDictSortChange_lexicon = onDictSortChange_lexicon;
   window.onDomainFilterChange_lexicon = onDomainFilterChange_lexicon;
   window.onFillLangChange_lexicon = onFillLangChange_lexicon;
   window.onTypeFilterChange_lexicon = onTypeFilterChange_lexicon;
